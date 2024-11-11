@@ -1,14 +1,32 @@
 <?php
 
 namespace App\Collections;
+
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserCollection extends Collection
 {
-    public function appendAttribute(string $attribute) : UserCollection
+    public function afterById(string $id)
     {
-        return $this->append($attribute);
+        $user = $this->firstWhere('id', $id);
+        return $this->after($user);
+    }
+
+    public function beforeById(string $id)
+    {
+        $user = $this->firstWhere('id', $id);
+        return $this->before($user);
+    }
+
+    public function chunkWhileUserAgeIsLessThan(int $age)
+    {
+        return $this->chunkWhile(fn ($user) => $user->age < $age);
+    }
+
+    public function averageAge()
+    {
+        return $this->avg('age');
     }
 
     public function containsEmail(string $email) : bool
@@ -16,10 +34,71 @@ class UserCollection extends Collection
         return $this->contains(fn (User $user) => $user->email === $email);
     }
 
+    public function countByRole()
+    {
+        return $this->countBy('role');
+    }
+
+    public function crossJoinWithPosts(PostCollection $posts)
+    {
+        return $this->crossJoin($posts);
+    }
+
     public function diffWithAdmins() : UserCollection
     {
         return $this->diff(User::where('role', 'admin')->get());
     }
+
+    public function diffAssocWithAdmins(): UserCollection
+    {
+        return $this->diffAssoc(User::where('role', 'admin')->get());
+    }
+
+    public function diffKeysWithAdmins() : UserCollection
+    {
+        return $this->diffKeys(User::where('role', 'admin')->get());
+    }
+
+    public function doesntContainEmail(string $email) : bool
+    {
+        return $this->doesntContain(fn (User $user) => $user->email === $email);
+    }
+
+    public function eachEmail()
+    {
+        $emails = [];
+        $this->each(function ($user) use (&$emails) {
+            $emails[] = $user->email;
+        });
+        return $emails;
+    }
+
+    public function duplicatesByLastName()
+    {
+        return $this->toBase()->duplicates('last_name');
+    }
+
+    public function duplicatesStrictByLastName()
+    {
+        return $this->toBase()->duplicatesStrict('last_name');
+    }
+
+    public function everyIsAdult()
+    {
+        return $this->every(fn ($user) => $user->age >= 18);
+    }
+
+    public function appendAttribute(string $attribute) : UserCollection
+    {
+        return $this->append($attribute);
+    }
+
+    public function intersectUserAndAdmins() : UserCollection
+    {
+        return $this->intersect(User::where('role', 'admin')->get());
+    }
+
+
 
     public function expectId(int $id) : UserCollection
     {

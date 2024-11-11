@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use App\Collections\UserCollection;
@@ -22,8 +21,12 @@ class User extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'role', 'status'
+        'first_name', 'last_name', 'email', 'role', 'status', 'age'
     ];
+
+    public function __construct(string $first_name = "") {
+        $this->first_name = $first_name;
+    }
 
     public function getFullNameAttribute()
     {
